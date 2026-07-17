@@ -27,3 +27,4 @@ dist/
 
 #ignore storage files
 storage 
+/config 
