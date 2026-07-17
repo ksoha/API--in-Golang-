@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/ksoha/API-in-Golang/internal/config"
+	"github.com/ksoha/API-in-Golang/internal/http/handlers/student"
 )
 
 func main() {
@@ -23,9 +24,7 @@ func main() {
 	//setup routes
 	router := http.NewServeMux()
 
-	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Welcome to Student API")) // converting string to byte slice
-	})
+	router.HandleFunc("POST /api/students", student.New())
 
 	//server setup
 
