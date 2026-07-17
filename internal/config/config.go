@@ -18,7 +18,7 @@ type Config struct {
 
 // different struct for http server cause it is nested
 type HTTPServer struct {
-	Addr string
+	Addr string `yaml:"addr" env-required:"true"`
 }
 
 // here must be a function which executed otherwise the program should not run
