@@ -45,5 +45,25 @@ func New(cfg *config.Config) (*Sqlite, error) {
 // implmenting the storage interface in this fucntion so the student.go can implemwnt the storage interface
 // to attach this function to the sqlite struct we use the reciever
 func (s *Sqlite) CreateStudent(name string, email string, age int) (int64, error) {
-	return 0, nil
+
+	//creating record in the database
+	stmt, err := s.Db.Prepare("INSERT INTO students(name, email, age) VALUES(?, ?, ?)")
+	if err != nil {
+		return 0, err
+	}
+	defer stmt.Close() //closing the statement after the function is executed
+
+	//executing the statement with the values passed to the function
+	result, err := stmt.Exec(name, email, age)
+	if err != nil {
+		return 0, err
+	}
+
+	lastid, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return lastid, nil
+
 }

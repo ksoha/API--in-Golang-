@@ -48,6 +48,20 @@ func New(storage storage.Storage) http.HandlerFunc {
 			return
 		}
 
-		response.WriteJSON(w, http.StatusAccepted, map[string]string{"success": "ok"})
+		//create the student in the database
+		lastid, err := storage.CreateStudent(
+			student.Name,
+			student.Email,
+			student.Age,
+		)
+
+		slog.Info("user created successfully", slog.Int64("id", lastid))
+
+		if err != nil {
+			response.WriteJSON(w, http.StatusInternalServerError, err)
+			return
+		}
+
+		response.WriteJSON(w, http.StatusAccepted, map[string]int64{"id": lastid})
 	}
 }
