@@ -6,6 +6,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"strconv"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/ksoha/API-in-Golang/internal/storage"
@@ -63,5 +64,36 @@ func New(storage storage.Storage) http.HandlerFunc {
 		}
 
 		response.WriteJSON(w, http.StatusAccepted, map[string]int64{"id": lastid})
+	}
+}
+
+func GetbyId(storage storage.Storage) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		//get the id from the url
+		id := r.PathValue("id")
+
+		slog.Info("getting student by id", slog.String("id", id))
+
+		//get the student from the database
+
+		//convert id(string) to int64
+		intId, err := strconv.ParseInt(id, 10, 64)
+		if err != nil {
+			response.WriteJSON(w, http.StatusBadRequest, response.GeneralError(err))
+			return
+		}
+
+		student, e := storage.GetStudentById(intId)
+		if e != nil {
+			response.WriteJSON(w, http.StatusInternalServerError, response.GeneralError(e))
+			return
+		}
+
+		response.WriteJSON(w, http.StatusOK, student)
+
+		//log the student details
+		slog.Info("student found", slog.Any("student", student))
+
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/ksoha/API-in-Golang/internal/config"
+	"github.com/ksoha/API-in-Golang/internal/types"
 	_ "github.com/mattn/go-sqlite3" //importing the sqlite3 driver
 )
 
@@ -66,4 +67,25 @@ func (s *Sqlite) CreateStudent(name string, email string, age int) (int64, error
 
 	return lastid, nil
 
+}
+
+// implementing the getStudentbyID
+func (s *Sqlite) GetStudentById(id int64) (types.Student, error) {
+	//the stmt is used to prepare the query and then we can execute it with the values passed to the function
+	stmt, err := s.Db.Prepare("SELECT * FROM STUDENTS WHERE id = ? LIMIT 1")
+	if err != nil {
+		return types.Student{}, err
+	}
+
+	defer stmt.Close() // closing the statement after the function is executed
+
+	//serealise the data from the database into the student struct
+	var student types.Student
+
+	//executing the query with the id passed to the function
+	err = stmt.QueryRow(id).Scan(&student.Id, &student.Name, &student.Age, &student.Email)
+	if err != nil {
+		return types.Student{}, err
+	}
+	return student, nil
 }
