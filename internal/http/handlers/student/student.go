@@ -8,11 +8,13 @@ import (
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/ksoha/API-in-Golang/internal/storage"
 	"github.com/ksoha/API-in-Golang/internal/types"
 	"github.com/ksoha/API-in-Golang/internal/utils/response"
 )
 
-func New() http.HandlerFunc {
+// receiving the storage interface as a dependency injection
+func New(storage storage.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		slog.Info("creating a new student")

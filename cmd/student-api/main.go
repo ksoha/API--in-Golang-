@@ -13,6 +13,7 @@ import (
 
 	"github.com/ksoha/API-in-Golang/internal/config"
 	"github.com/ksoha/API-in-Golang/internal/http/handlers/student"
+	"github.com/ksoha/API-in-Golang/internal/storage/sqlite"
 )
 
 func main() {
@@ -20,11 +21,17 @@ func main() {
 	cfg := config.MustLoad()
 
 	//database setup
+	storage, err := sqlite.New(cfg)
+	if err != nil {
+		log.Fatal("failed to connect to the datbase", err)
+	}
+
+	slog.Info("datbase connected successfully, storage initialized", slog.String("env", cfg.Env))
 
 	//setup routes
 	router := http.NewServeMux()
 
-	router.HandleFunc("POST /api/students", student.New())
+	router.HandleFunc("POST /api/students", student.New(storage))
 
 	//server setup
 
@@ -60,7 +67,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second) //this will create a context with a timeout of 5 seconds
 	defer cancel()
 
-	err := server.Shutdown(ctx)
+	err = server.Shutdown(ctx)
 	if err != nil {
 		slog.Error("failed to shutdown the server", slog.String("error", err.Error()))
 	}
